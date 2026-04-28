@@ -1,1021 +1,439 @@
-
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grand Oral – Grille d'évaluation</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&display=swap');
-
-    :root {
-      --rose: #0ba156;
-      --texte: #1a1a1a;
-      --border: #c8c8c8;
-      --gris1: #f6f6f6;
-      --gris2: #e4e4e4;
-      /* niveaux */
-      --ti-bg: #fde8e8;
-      --ti-bd: #c62828;
-      --ti-tx: #b71c1c;
-      --fr-bg: #fff3e0;
-      --fr-bd: #e65100;
-      --fr-tx: #bf360c;
-      --s-bg: #e8f5e9;
-      --s-bd: #2e7d32;
-      --s-tx: #1b5e20;
-      --ts-bg: #e3f2fd;
-      --ts-bd: #1565c0;
-      --ts-tx: #0d47a1;
-      /* checkbox */
-      --cb: 24px;
-      /* taille case = 14px × 1.7 ≈ 24px */
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Source Sans 3', sans-serif;
-      font-size: 13px;
-      color: var(--texte);
-      background: #dde1e7;
-      padding: 20px;
-    }
-
-    /* ════════════════ TOOLBAR ════════════════ */
-    #toolbar {
-      max-width: 1200px;
-      margin: 0 auto 14px;
-      background: #fff;
-      border-radius: 10px;
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
-    }
-
-    .tb-group {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .tb-group label {
-      font-weight: 700;
-      font-size: 12px;
-      color: #555;
-      white-space: nowrap;
-    }
-
-    .tb-input {
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      padding: 7px 11px;
-      font-family: inherit;
-      font-size: 13px;
-      outline: none;
-      transition: border-color .2s;
-      background: #fafafa;
-    }
-
-    .tb-input:focus {
-      border-color: var(--rose);
-      background: #fff;
-    }
-
-    #nom-input {
-      width: 210px;
-    }
-
-    #date-input {
-      width: 150px;
-      cursor: pointer;
-    }
-
-    #titre-input {
-      width: 240px;
-    }
-
-    #date-input::-webkit-calendar-picker-indicator {
-      opacity: .6;
-      cursor: pointer;
-    }
-
-    #score-display {
-      margin-left: auto;
-      background: var(--rose);
-      color: #fff;
-      border-radius: 8px;
-      padding: 8px 18px;
-      font-size: 15px;
-      font-weight: 700;
-      min-width: 118px;
-      text-align: center;
-    }
-
-    #btn-reset {
-      background: #fff;
-      color: #555;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      padding: 7px 13px;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: background .15s;
-    }
-
-    #btn-reset:hover {
-      background: #f0f0f0;
-    }
-
-    #btn-export {
-      background: var(--rose);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 17px;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background .2s, transform .1s;
-    }
-
-    #btn-export:hover {
-      background: #b5005f;
-    }
-
-    #btn-export:active {
-      transform: scale(.97);
-    }
-
-    .tb-hint {
-      font-size: 11px;
-      color: #999;
-      font-style: italic;
-      width: 100%;
-      margin-top: -4px;
-      padding-left: 2px;
-    }
-
-    /* ════════════════ DOCUMENT ════════════════ */
-    #document {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 22px 26px 28px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, .12);
-      border-radius: 6px;
-    }
-
-    /* Titre principal */
-    .doc-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 13px;
-      gap: 16px;
-    }
-
-    .titre-bloc {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      flex-shrink: 0;
-    }
-
-    .numero-cercle {
-      width: 33px;
-      height: 33px;
-      background: var(--rose);
-      border-radius: 50%;
-      color: #fff;
-      font-weight: 700;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .titre-texte h1 {
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-
-    .sous-titre-grille {
-      display: inline-block;
-      background: var(--rose);
-      color: #fff;
-      font-weight: 700;
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 3px;
-      margin-top: 5px;
-    }
-
-    .bo-ref {
-      font-size: 11px;
-      color: #777;
-      margin-left: 5px;
-    }
-
-    /* Bloc titre épreuve (haut droite du document) */
-    .titre-epreuve-bloc {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      min-width: 200px;
-      max-width: 340px;
-    }
-
-    .titre-epreuve-label {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: #aaa;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-
-    .titre-epreuve-val {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--rose);
-      text-align: right;
-      font-style: italic;
-      min-height: 20px;
-      line-height: 1.2;
-    }
-
-    /* Bandeau identité */
-    .identite-band {
-      display: flex;
-      align-items: stretch;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      overflow: hidden;
-      margin-bottom: 13px;
-      background: var(--gris1);
-    }
-
-    .id-cell {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 9px 16px;
-      border-right: 1.5px solid var(--border);
-      flex: 1;
-    }
-
-    .id-cell:last-child {
-      border-right: none;
-    }
-
-    .id-label {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      white-space: nowrap;
-    }
-
-    .id-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--texte);
-      min-width: 60px;
-    }
-
-    .score-cell {
-      background: var(--rose) !important;
-      flex: 0 0 auto;
-      padding: 9px 22px !important;
-      border-right: none !important;
-    }
-
-    .score-cell .id-label {
-      color: rgba(255, 255, 255, .75);
-    }
-
-    .score-cell .id-value {
-      color: #fff;
-      font-size: 18px;
-    }
-
-    /* Cellule titre dans le bandeau */
-    .titre-cell {
-      background: rgba(226, 0, 122, .06) !important;
-    }
-
-    .titre-cell .id-value {
-      color: var(--rose);
-      font-style: italic;
-    }
-
-    /* Légende */
-    .legend-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 11px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
-    .legend-dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-
-    .ld-ti {
-      background: var(--ti-bd);
-    }
-
-    .ld-fr {
-      background: var(--fr-bd);
-    }
-
-    .ld-s {
-      background: var(--s-bd);
-    }
-
-    .ld-ts {
-      background: var(--ts-bd);
-    }
-
-    .legend-sep {
-      color: #ccc;
-      font-size: 15px;
-    }
-
-    /* ════════════════ TABLEAU ════════════════ */
-    .table-wrapper {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
-
-    thead th {
-      background: #fff;
-      border: 1.5px solid var(--border);
-      padding: 8px 9px;
-      text-align: center;
-      font-weight: 700;
-      font-size: 11.5px;
-      vertical-align: bottom;
-      line-height: 1.35;
-    }
-
-    thead th:first-child {
-      width: 85px;
-      border: none;
-      background: transparent;
-    }
-
-    tbody td {
-      border: 1.5px solid var(--border);
-      padding: 10px 10px;
-      vertical-align: middle;
-      /* centrage vertical */
-      line-height: 1.4;
-      font-size: 11.5px;
-      background: #fff;
-      transition: background .18s, border-left-color .18s;
-    }
-
-    tbody tr:nth-child(even) td {
-      background: var(--gris1);
-    }
-
-    .td-niveau {
-      border: none !important;
-      background: transparent !important;
-      font-weight: 700;
-      font-size: 11.5px;
-      text-align: center;
-      vertical-align: middle;
-      padding: 5px 5px;
-      white-space: nowrap;
-    }
-
-    .niveau-ti .td-niveau {
-      color: var(--ti-tx);
-    }
-
-    .niveau-fr .td-niveau {
-      color: var(--fr-tx);
-    }
-
-    .niveau-s .td-niveau {
-      color: var(--s-tx);
-    }
-
-    .niveau-ts .td-niveau {
-      color: var(--ts-tx);
-    }
-
-    /* Cellule cochée */
-    td.ck-ti {
-      background: var(--ti-bg) !important;
-      border-left: 3px solid var(--ti-bd) !important;
-    }
-
-    td.ck-fr {
-      background: var(--fr-bg) !important;
-      border-left: 3px solid var(--fr-bd) !important;
-    }
-
-    td.ck-s {
-      background: var(--s-bg) !important;
-      border-left: 3px solid var(--s-bd) !important;
-    }
-
-    td.ck-ts {
-      background: var(--ts-bg) !important;
-      border-left: 3px solid var(--ts-bd) !important;
-    }
-
-    /* ── Checkbox custom (24 px) ── */
-    .cell-inner {
-      display: flex;
-      align-items: center;
-      /* centrage vertical de la case avec le texte */
-      gap: 10px;
-    }
-
-    .custom-check {
-      position: relative;
-      flex-shrink: 0;
-      width: var(--cb);
-      height: var(--cb);
-      cursor: pointer;
-    }
-
-    .custom-check input[type="checkbox"] {
-      position: absolute;
-      opacity: 0;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      cursor: pointer;
-      z-index: 2;
-    }
-
-    .cbox {
-      position: absolute;
-      inset: 0;
-      border: 2px solid #aaa;
-      border-radius: 3px;
-      background: #fff;
-      pointer-events: none;
-      transition: background .12s, border-color .12s;
-    }
-
-    .cbox.ck-ti {
-      background: var(--ti-bd);
-      border-color: var(--ti-bd);
-    }
-
-    .cbox.ck-fr {
-      background: var(--fr-bd);
-      border-color: var(--fr-bd);
-    }
-
-    .cbox.ck-s {
-      background: var(--s-bd);
-      border-color: var(--s-bd);
-    }
-
-    .cbox.ck-ts {
-      background: var(--ts-bd);
-      border-color: var(--ts-bd);
-    }
-
-    .cbox::after {
-      content: '';
-      position: absolute;
-      display: none;
-      left: 5px;
-      top: 1px;
-      width: 9px;
-      height: 13px;
-      border: 2.5px solid #fff;
-      border-top: none;
-      border-left: none;
-      transform: rotate(45deg);
-    }
-
-    .cbox.ck-ti::after,
-    .cbox.ck-fr::after,
-    .cbox.ck-s::after,
-    .cbox.ck-ts::after {
-      display: block;
-    }
-
-    .cell-text {
-      flex: 1;
-    }
-
-    /* Score ligne */
-    .score-row td {
-      border: none !important;
-      background: transparent !important;
-      padding: 12px 0 0;
-    }
-
-    .score-inner {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .score-detail {
-      font-size: 10.5px;
-      color: #999;
-      font-style: italic;
-    }
-
-    .score-value-doc {
-      background: var(--rose);
-      color: #fff;
-      border-radius: 6px;
-      padding: 6px 22px;
-      font-size: 17px;
-      font-weight: 700;
-      min-width: 95px;
-      text-align: center;
-    }
-
-    /* Footer */
-    .doc-footer {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 14px;
-      font-size: 10px;
-      color: #bbb;
-      border-top: 1px solid var(--gris2);
-      padding-top: 8px;
-    }
-
-    @media print {
-      body {
-        background: #fff;
-        padding: 0;
-      }
-
-      #toolbar {
-        display: none !important;
-      }
-
-      #document {
-        box-shadow: none;
-        padding: 8mm 10mm;
-        max-width: 100%;
-        border-radius: 0;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Évaluation – Défi 12H – Robot Serveur</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --e1: #5b21b6; --e1-light: #ede9fe; --e1-mid: #c4b5fd;
+  --e2: #0e7490; --e2-light: #e0f2fe; --e2-mid: #7dd3fc;
+  --e3: #065f46; --e3-light: #d1fae5; --e3-mid: #6ee7b7;
+  --n0: #dc2626; --n1: #d97706; --n2: #16a34a;
+  --gray1:#f8f8f8; --gray2:#f0f0f0; --gray3:#d4d4d4;
+  --gray4:#a3a3a3; --gray5:#525252; --gray6:#1a1a1a;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:#e5e5e5; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--gray6); }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  background:#1e1e2e; color:#cdd6f4;
+  padding:12px 32px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  position:sticky; top:0; z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,.35);
+}
+.toolbar-title { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:.06em; color:#89b4fa; }
+.toolbar-legend { display:flex; gap:18px; flex-wrap:wrap; align-items:center; }
+.leg { display:flex; align-items:center; gap:5px; font-size:11px; color:#a6adc8; }
+.leg-dot { width:18px; height:18px; border-radius:50%; border:1.5px solid; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; }
+.btn-pdf {
+  background:#89b4fa; color:#1e1e2e; border:none;
+  padding:8px 20px; font-family:'DM Mono',monospace; font-size:12px; font-weight:600;
+  border-radius:6px; cursor:pointer; letter-spacing:.05em;
+  display:flex; align-items:center; gap:7px; transition:background .2s;
+}
+.btn-pdf:hover { background:#b4d0ff; }
+
+/* ── PAGES WRAPPER ── */
+.pages { display:flex; flex-direction:column; align-items:center; gap:24px; padding:28px 16px 48px; }
+
+/* ── A4 SHEET ── */
+.sheet {
+  background:#fff;
+  width:210mm; min-height:297mm;
+  box-shadow:0 4px 24px rgba(0,0,0,.18);
+  padding:13mm 14mm 11mm;
+  display:flex; flex-direction:column; gap:0;
+}
+.e1 { --acc:var(--e1); --acc-l:var(--e1-light); --acc-m:var(--e1-mid); }
+.e2 { --acc:var(--e2); --acc-l:var(--e2-light); --acc-m:var(--e2-mid); }
+.e3 { --acc:var(--e3); --acc-l:var(--e3-light); --acc-m:var(--e3-mid); }
+
+/* ── Sheet header ── */
+.sh-head {
+  border-bottom:2.5px solid var(--acc);
+  padding-bottom:8px; margin-bottom:9px;
+  display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
+}
+.sh-meta { flex:1; }
+.sh-defi {
+  font-family:'DM Mono',monospace; font-size:8px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--acc); margin-bottom:3px;
+}
+.sh-title {
+  font-family:'Source Serif 4',serif; font-size:16px; font-weight:700; line-height:1.15;
+}
+.sh-mission { font-size:10.5px; color:var(--gray5); margin-top:3px; font-style:italic; }
+
+/* ── Score box ── */
+.score-box {
+  background:var(--acc-l); border:1.5px solid var(--acc-m); border-radius:8px;
+  padding:7px 16px; text-align:center; min-width:105px;
+}
+.score-lbl { font-family:'DM Mono',monospace; font-size:8px; text-transform:uppercase; letter-spacing:.1em; color:var(--acc); margin-bottom:2px; }
+.score-val { font-family:'Source Serif 4',serif; font-size:26px; font-weight:700; color:var(--acc); line-height:1; transition:color .3s; }
+.score-den { font-size:10px; color:var(--acc); font-family:'DM Mono',monospace; }
+.score-bar { width:75px; height:3px; background:var(--acc-m); border-radius:2px; margin:4px auto 0; overflow:hidden; }
+.score-fill { height:100%; border-radius:2px; background:var(--acc); width:0%; transition:width .4s; }
+
+/* ── Identity ── */
+.id-row { display:flex; gap:20px; margin-bottom:9px; align-items:flex-end; flex-wrap:wrap; }
+.id-f { display:flex; flex-direction:column; gap:2px; }
+.id-lbl { font-family:'DM Mono',monospace; font-size:8px; text-transform:uppercase; letter-spacing:.1em; color:var(--gray4); }
+.id-in {
+  border:none; border-bottom:1.5px solid var(--gray3);
+  padding:2px 0; font-family:'DM Sans',sans-serif; font-size:13.5px; font-weight:600;
+  color:var(--gray6); width:130px; outline:none; background:transparent;
+  transition:border-color .2s;
+}
+.id-in:focus { border-bottom-color:var(--acc); }
+
+/* ── Hour group ── */
+.hg { margin-bottom:5px; }
+.hg-hdr {
+  display:flex; align-items:center; gap:7px;
+  padding:3px 7px; border-radius:4px; background:var(--gray1);
+  margin-bottom:3px;
+}
+.hg-tag {
+  font-family:'DM Mono',monospace; font-size:8px; font-weight:500;
+  padding:2px 8px; border-radius:10px; white-space:nowrap;
+}
+.hg-tag.sp { background:var(--acc-l); color:var(--acc); border:1px solid var(--acc-m); }
+.hg-tag.cm { background:#f5f5f5; color:var(--gray5); border:1px solid var(--gray3); }
+.hg-ttl { font-size:9.5px; color:var(--gray5); font-style:italic; }
+
+/* ── Mission row ── */
+.mrow {
+  display:flex; align-items:center; gap:8px;
+  padding:4px 6px 4px 9px; margin-bottom:2px;
+  border-radius:4px; border-left:2.5px solid var(--gray3);
+  background:#fdfdfd; transition:background .12s;
+}
+.mrow:hover { background:var(--acc-l); }
+.mrow.lv0 { border-left-color:var(--n0); }
+.mrow.lv1 { border-left-color:var(--n1); }
+.mrow.lv2 { border-left-color:var(--n2); }
+.mtxt { flex:1; min-width:0; }
+.mtit { font-size:11px; font-weight:500; color:var(--gray6); line-height:1.35; }
+.mres { font-size:9px; color:var(--gray4); margin-top:1px; }
+.mres b { color:var(--gray5); }
+
+/* ── Level buttons ── */
+.lvls { display:flex; gap:3px; flex-shrink:0; align-items:center; }
+.lb {
+  width:24px; height:24px; border-radius:50%; border:1.5px solid transparent;
+  background:transparent; cursor:pointer;
+  font-size:10px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .12s; position:relative;
+}
+.lb[data-v="0"] { border-color:#fca5a5; color:#fca5a5; }
+.lb[data-v="1"] { border-color:#fcd34d; color:#fcd34d; }
+.lb[data-v="2"] { border-color:#86efac; color:#86efac; }
+.lb[data-v="0"].on { background:#fef2f2; border-color:var(--n0); color:var(--n0); box-shadow:0 0 0 2px rgba(220,38,38,.15); }
+.lb[data-v="1"].on { background:#fffbeb; border-color:var(--n1); color:var(--n1); box-shadow:0 0 0 2px rgba(217,119,6,.15); }
+.lb[data-v="2"].on { background:#f0fdf4; border-color:var(--n2); color:var(--n2); box-shadow:0 0 0 2px rgba(22,163,74,.15); }
+.lb:hover:not(.on) { transform:scale(1.15); background:var(--gray2); }
+.tip {
+  position:absolute; bottom:calc(100% + 4px); left:50%; transform:translateX(-50%);
+  background:#1e1e2e; color:#cdd6f4; font-size:8.5px; font-family:'DM Mono',monospace;
+  white-space:nowrap; padding:2px 6px; border-radius:3px;
+  pointer-events:none; opacity:0; transition:opacity .12s; z-index:20;
+}
+.lb:hover .tip { opacity:1; }
+
+/* ── Points ── */
+.pts { font-family:'DM Mono',monospace; font-size:10px; color:var(--gray4); width:22px; text-align:right; flex-shrink:0; }
+.pts.on { color:var(--acc); font-weight:600; }
+
+/* ── Footer ── */
+.sh-foot {
+  margin-top:auto; padding-top:8px;
+  border-top:1px solid var(--gray3);
+  display:flex; justify-content:space-between; align-items:flex-end;
+}
+.obs { flex:1; }
+.obs-lbl { font-family:'DM Mono',monospace; font-size:8px; text-transform:uppercase; letter-spacing:.1em; color:var(--gray4); margin-bottom:3px; }
+.obs-line { border-bottom:1px solid var(--gray3); height:16px; width:88%; margin-bottom:4px; }
+.sig { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.sig-lbl { font-family:'DM Mono',monospace; font-size:8px; text-transform:uppercase; letter-spacing:.1em; color:var(--gray4); }
+.sig-box { width:65px; height:30px; border:1px solid var(--gray3); border-radius:4px; }
+
+/* ═══ PRINT ═══ */
+@media print {
+  @page { size:A4; margin:0; }
+  body { background:white; }
+  .toolbar { display:none !important; }
+  .pages { padding:0; gap:0; }
+  .sheet {
+    width:100%; min-height:0; height:297mm;
+    box-shadow:none;
+    page-break-after:always; break-after:page;
+  }
+  .sheet:last-child { page-break-after:avoid; break-after:avoid; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+  .tip { display:none !important; }
+  .lb.on { border-width:2px !important; }
+}
+</style>
 </head>
-
 <body>
 
-  <!-- ═══════════ TOOLBAR ═══════════ -->
-  <div id="toolbar">
-    <div class="tb-group">
-      <label for="nom-input">👤 Élève</label>
-      <input type="text" id="nom-input" class="tb-input" placeholder="Prénom NOM" oninput="updateNom(this.value)" />
-    </div>
-    <div class="tb-group">
-      <label for="date-input">📅 Date</label>
-      <input type="date" id="date-input" class="tb-input" onchange="updateDate(this.value)" />
-    </div>
-    <div class="tb-group">
-      <label for="titre-input">📋 Titre de l'épreuve</label>
-      <input type="text" id="titre-input" class="tb-input" placeholder="Ex : Oral – Terminale STI2D"
-        oninput="updateTitre(this.value)" />
-    </div>
-    <div id="score-display">Note : — / 20</div>
-    <button id="btn-reset" onclick="resetAll()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-        stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="1 4 1 10 7 10" />
-        <path d="M3.51 15a9 9 0 1 0 .49-4.5" />
-      </svg>
-      Réinitialiser
-    </button>
-    <button id="btn-export" onclick="exportPDF()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="12" y1="11" x2="12" y2="17" />
-        <line x1="9" y1="14" x2="15" y2="14" />
-      </svg>
-      Exporter en PDF
-    </button>
-    <div class="tb-hint">
-      ☑ Cochez <strong>1 case</strong> ou <strong>2 cases adjacentes</strong> par critère · note intermédiaire calculée
-      automatiquement · 2 cases non adjacentes = remplacement
-    </div>
+<div class="toolbar">
+  <div class="toolbar-title">STI2D — Évaluation Défi 12H · Robot Serveur</div>
+  <div class="toolbar-legend">
+    <div class="leg"><div class="leg-dot" style="border-color:#dc2626;color:#dc2626">✗</div>Non atteint — 0 pt</div>
+    <div class="leg"><div class="leg-dot" style="border-color:#d97706;color:#d97706">~</div>Partiellement atteint — 1 pt</div>
+    <div class="leg"><div class="leg-dot" style="border-color:#16a34a;color:#16a34a">✓</div>Atteint — 2 pts</div>
   </div>
+  <button class="btn-pdf" onclick="window.print()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Imprimer / Exporter PDF
+  </button>
+</div>
 
-  <!-- ═══════════ DOCUMENT ═══════════ -->
-  <div id="document">
+<div class="pages" id="pages"></div>
 
-    <!-- En-tête : titre à gauche, titre épreuve à droite -->
-    <div class="doc-header">
-      <div class="titre-bloc">
-        <div class="numero-cercle">1</div>
-        <div class="titre-texte">
-          <h1>Préparer le Grand Oral</h1>
-          <div>
-            <span class="sous-titre-grille">Grille d'évaluation</span>
-            <span class="bo-ref">(Bulletin officiel spécial n°2 du 13 février 2020)</span>
-          </div>
+<script>
+const DATA = [
+  { id:'e1', cls:'e1', lbl:'Élève 1',
+    mission:'Mission : Remplacer la carte Arduino par la micro:bit (Python) et minimiser le risque de basculement du robot',
+    groups:[
+      { h:'H 1', cm:true, ttl:'Présentation & appropriation du défi', ms:[
+        { t:'Compréhension du défi présenté par les enseignants', r:'Compréhension du défi' },
+        { t:'Réflexion collective sur les exigences à atteindre durant le défi', r:'Appropriation collective et individuelle du défi' },
+        { t:'Choix de sa mission au sein du groupe', r:'Rôle Élève 1 identifié et accepté' },
+      ]},
+      { h:'H 2 – H 3', cm:true, ttl:'Appropriation du robot Arduino', ms:[
+        { t:'Appropriation du fonctionnement des capteurs, actionneurs et de leur programmation', r:'Savoir programmer les actionneurs et capteurs avec la carte Arduino' },
+      ]},
+      { h:'H 4 – H 5', cm:false, ttl:'Recherche nouvelle carte de puissance + modélisation Inventor', ms:[
+        { t:'Recherche d\'une nouvelle carte de puissance respectant la connectique mBot et la tension adaptée à la micro:bit', r:'Bon de commande de la nouvelle carte de puissance' },
+        { t:'Modélisation simplifiée sous Inventor de la nouvelle carte et de la micro:bit', r:'Maquette numérique simplifiée de l\'assemblage' },
+      ]},
+      { h:'H 6 – H 8', cm:false, ttl:'Cartérisation + adaptation pièce support assiette (CDG le plus bas)', ms:[
+        { t:'Cartérisation simplifiée de la nouvelle carte micro:bit (protection physique)', r:'Maquette virtuelle + réalisation physique de la protection' },
+        { t:'Adaptation de la pièce support d\'assiette (élève 3) sur le mBot micro:bit — CDG le plus bas possible', r:'Maquette virtuelle + assemblage physique sur le mBot' },
+      ]},
+      { h:'H 9', cm:true, ttl:'Expérimentations et validation du prototype', ms:[
+        { t:'Expérimentation des solutions, amélioration du comportement et validation du prototype', r:'Essais et mises au point du prototype finalisés' },
+      ]},
+      { h:'H 10', cm:false, ttl:'Recherche expérimentale — Centre de gravité', ms:[
+        { t:'Détermination expérimentale de la position du centre de gravité de l\'ensemble par rapport au sol', r:'Position du CDG / sol mesurée + protocole expérimental décrit' },
+      ]},
+      { h:'H 11', cm:false, ttl:'Validation et justification des écarts', ms:[
+        { t:'Calcul et justification de l\'écart entre la position du CDG simulée et expérimentale', r:'Valeur de l\'écart en % + justification et conclusion' },
+      ]},
+      { h:'H 12', cm:true, ttl:'Réalisation du défi final', ms:[
+        { t:'Mise en œuvre sur circuit découvert — temps minimum, écart latéral faible, CDG le plus bas possible', r:'Circuit réalisé — temps, écart latéral, position CDG évalués' },
+      ]},
+    ]
+  },
+  { id:'e2', cls:'e2', lbl:'Élève 2',
+    mission:'Mission : Assurer le guidage optique du robot le long d\'une ligne noire',
+    groups:[
+      { h:'H 1', cm:true, ttl:'Présentation & appropriation du défi', ms:[
+        { t:'Compréhension du défi présenté par les enseignants', r:'Compréhension du défi' },
+        { t:'Réflexion collective sur les exigences à atteindre durant le défi', r:'Appropriation collective et individuelle du défi' },
+        { t:'Choix de sa mission au sein du groupe', r:'Rôle Élève 2 identifié et accepté' },
+      ]},
+      { h:'H 2 – H 3', cm:true, ttl:'Appropriation du robot + mesures de performances', ms:[
+        { t:'Programmation par blocs des tests unitaires (capteur US / capteur optique / moteurs D & G)', r:'Savoir programmer les actionneurs et capteurs' },
+        { t:'Mesure des performances : écart de vitesse angulaire, sensibilité capteur optique, précision capteur US', r:'Relevé de performances unitaires chiffrées' },
+      ]},
+      { h:'H 4 – H 5', cm:false, ttl:'Algorithme de guidage optique + solutions d\'adaptation de vitesse', ms:[
+        { t:'Recherche de l\'algorithme de guidage optique le long de la ligne noire', r:'Algorigramme du programme principal de guidage optique' },
+        { t:'Recherche des solutions d\'adaptation de vitesse (marquage, balisage) + croquis des repères d\'arrêt', r:'Schéma des marqueurs + croquis d\'installation des repères' },
+      ]},
+      { h:'H 6 – H 8', cm:false, ttl:'Programmation Python des fonctions de navigation', ms:[
+        { t:'Fonctions paramétrées avance(Vg,Vd), droite(Vg,Vd), gauche(Vg,Vd) — adaptation de vitesse virage / ligne droite', r:'Programmes Python des 3 fonctions paramétrées opérationnels' },
+        { t:'Programmation de la fonction arrêt() à la table du client', r:'Programme Python de la fonction arrêt()' },
+        { t:'Programmation de la détection d\'obstacle : fonction obstacle()', r:'Programme Python de la fonction obstacle()' },
+      ]},
+      { h:'H 9', cm:true, ttl:'Expérimentations et validation du prototype', ms:[
+        { t:'Expérimentation, amélioration et validation — programmes et algorigrammes mis à jour', r:'Prototype validé, programmes et algorigrammes finalisés' },
+      ]},
+      { h:'H 10', cm:false, ttl:'Recherche expérimentale — Déplacements latéraux', ms:[
+        { t:'Mesure expérimentale des déplacements latéraux du robot durant le mouvement (fluidité des trajectoires)', r:'Protocole expérimental + relevé de trajectoires sur feuille A3' },
+      ]},
+      { h:'H 11', cm:false, ttl:'Validation et justification des écarts', ms:[
+        { t:'Calcul et justification de l\'écart entre le déplacement latéral réel en virage et celui souhaité', r:'Écart relatif maximal mesuré + analyse comparative des trajectoires' },
+      ]},
+      { h:'H 12', cm:true, ttl:'Réalisation du défi final', ms:[
+        { t:'Mise en œuvre sur circuit découvert — temps minimum, écart latéral minimal, assiette non renversée', r:'Circuit réalisé — temps et écart latéral évalués' },
+      ]},
+    ]
+  },
+  { id:'e3', cls:'e3', lbl:'Élève 3',
+    mission:'Mission : Assurer le maintien en position de l\'assiette le long du parcours',
+    groups:[
+      { h:'H 1', cm:true, ttl:'Présentation & appropriation du défi', ms:[
+        { t:'Compréhension du défi présenté par les enseignants', r:'Compréhension du défi' },
+        { t:'Réflexion collective sur les exigences à atteindre durant le défi', r:'Appropriation collective et individuelle du défi' },
+        { t:'Choix de sa mission au sein du groupe', r:'Rôle Élève 3 identifié et accepté' },
+      ]},
+      { h:'H 2 – H 3', cm:true, ttl:'Appropriation du robot Arduino', ms:[
+        { t:'Appropriation du fonctionnement des capteurs, actionneurs et de leur programmation', r:'Savoir programmer les actionneurs et capteurs avec la carte Arduino' },
+      ]},
+      { h:'H 4 – H 5', cm:false, ttl:'Conception et fabrication de la pièce support d\'assiette', ms:[
+        { t:'Dessins à main levée + choix d\'une solution et dessin sous Inventor', r:'Dessins à main levée + dessin de la solution choisie sous Inventor' },
+        { t:'Fabrication de la pièce support en impression 3D et assemblage sur le robot mBot', r:'Pièce support fabriquée et montée sur le mBot' },
+      ]},
+      { h:'H 6 – H 8', cm:false, ttl:'Détermination de la consigne maximale pour éviter le glissement', ms:[
+        { t:'Mesure expérimentale du coefficient de frottement entre la pièce support et l\'assiette', r:'Coefficient de frottement déterminé expérimentalement' },
+        { t:'Calcul de la vitesse maxi théorique en virage pour éviter le glissement (application du PFD)', r:'Vitesse maximum théorique en virage déterminée' },
+        { t:'Détermination expérimentale de la relation entre la valeur PWM et la vitesse du robot', r:'Courbe reliant la valeur PWM et la vitesse du robot établie' },
+      ]},
+      { h:'H 9', cm:true, ttl:'Expérimentations et validation du prototype', ms:[
+        { t:'Expérimentation, amélioration et validation du prototype', r:'Essais et mises au point du prototype finalisés' },
+      ]},
+      { h:'H 10', cm:false, ttl:'Recherche expérimentale — Vitesse de glissement', ms:[
+        { t:'Détermination expérimentale de la vitesse réelle en virage à partir de laquelle l\'assiette glisse', r:'Vitesse réelle maxi de glissement + protocole expérimental décrit' },
+      ]},
+      { h:'H 11', cm:false, ttl:'Validation et justification des écarts', ms:[
+        { t:'Calcul et justification de l\'écart entre la vitesse théorique et la vitesse expérimentale de glissement', r:'Écart en % théorique/expérimental + justification et conclusion' },
+      ]},
+      { h:'H 12', cm:true, ttl:'Réalisation du défi final', ms:[
+        { t:'Mise en œuvre sur circuit découvert — assiette stable, temps minimum, trajectoire fluide', r:'Assiette non renversée, temps et écart latéral minimisés' },
+      ]},
+    ]
+  }
+];
+
+/* ── State: stored values are 0, 1 or 2 (= 0pt, 1pt, 2pts)
+   Note = sum(values) / (nbMissions × 2) × 20              ── */
+const STATE = {};
+
+function calcNote(sid) {
+  const s = DATA.find(x => x.id === sid);
+  const nbMs = s.groups.reduce((a,g) => a + g.ms.length, 0);
+  const maxPts = nbMs * 2;
+  const total  = Object.entries(STATE)
+    .filter(([k]) => k.startsWith(sid + '-'))
+    .reduce((a,[,v]) => a + v, 0);
+  const pct  = maxPts > 0 ? total / maxPts * 100 : 0;
+  const note = (total / maxPts * 20).toFixed(1);
+  return { note, pct };
+}
+
+function refreshNote(sid) {
+  const { note, pct } = calcNote(sid);
+  const el = document.getElementById('sv-' + sid);
+  const fl = document.getElementById('sf-' + sid);
+  if (!el) return;
+  el.textContent = note;
+  const n = parseFloat(note);
+  el.style.color = n >= 14 ? '#16a34a' : n >= 10 ? '#d97706' : '#dc2626';
+  fl.style.width = pct + '%';
+  fl.style.background = pct >= 70 ? '#16a34a' : pct >= 50 ? '#d97706' : '#dc2626';
+}
+
+function clickLvl(btn, sid, gi, mi, val) {
+  const key  = sid + '-' + gi + '-' + mi;
+  const row  = btn.closest('.mrow');
+  const btns = btn.closest('.lvls').querySelectorAll('.lb');
+  const pts  = document.getElementById('pt-' + key);
+
+  if (STATE[key] === val) {
+    // deselect
+    delete STATE[key];
+    btns.forEach(b => b.classList.remove('on'));
+    row.className = row.className.replace(/\blv\d\b/g,'').trim();
+    if (pts) { pts.textContent = ''; pts.classList.remove('on'); }
+  } else {
+    STATE[key] = val;
+    btns.forEach(b => b.classList.toggle('on', +b.dataset.v === val));
+    row.className = row.className.replace(/\blv\d\b/g,'').trim() + ' lv' + val;
+    if (pts) { pts.textContent = val; pts.classList.add('on'); }
+  }
+  refreshNote(sid);
+}
+
+function build(s) {
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet ' + s.cls;
+
+  // header
+  const head = document.createElement('div');
+  head.className = 'sh-head';
+  head.innerHTML = `
+    <div class="sh-meta">
+      <div class="sh-defi">STI2D — Défi 12H · Robot Serveur · Thématique : L'homme assisté-augmenté</div>
+      <div class="sh-title">${s.lbl} — Fiche d'évaluation individuelle</div>
+      <div class="sh-mission">${s.mission}</div>
+    </div>
+    <div class="score-box">
+      <div class="score-lbl">Note globale</div>
+      <div class="score-val" id="sv-${s.id}">0.0</div>
+      <div class="score-den">/ 20</div>
+      <div class="score-bar"><div class="score-fill" id="sf-${s.id}"></div></div>
+    </div>
+  `;
+  sheet.appendChild(head);
+
+  // identity
+  const idr = document.createElement('div');
+  idr.className = 'id-row';
+  idr.innerHTML = `
+    <div class="id-f"><div class="id-lbl">Nom</div><input class="id-in" type="text" placeholder="Nom de famille" /></div>
+    <div class="id-f"><div class="id-lbl">Prénom</div><input class="id-in" type="text" placeholder="Prénom" /></div>
+    <div class="id-f"><div class="id-lbl">Groupe</div><input class="id-in" type="text" placeholder="N° groupe" style="width:75px"/></div>
+    <div class="id-f" style="margin-left:auto"><div class="id-lbl">Date</div><input class="id-in" type="text" placeholder="jj/mm/aaaa" style="width:105px"/></div>
+  `;
+  sheet.appendChild(idr);
+
+  // missions
+  s.groups.forEach((grp, gi) => {
+    const hg = document.createElement('div');
+    hg.className = 'hg';
+    const hdr = document.createElement('div');
+    hdr.className = 'hg-hdr';
+    hdr.innerHTML = `<span class="hg-tag ${grp.cm?'cm':'sp'}">${grp.h}</span><span class="hg-ttl">${grp.ttl}</span>`;
+    hg.appendChild(hdr);
+
+    grp.ms.forEach((m, mi) => {
+      const row = document.createElement('div');
+      row.className = 'mrow';
+      row.innerHTML = `
+        <div class="mtxt">
+          <div class="mtit">${m.t}</div>
+          <div class="mres"><b>Résultat attendu :</b> ${m.r}</div>
         </div>
-      </div>
-      <!-- Titre épreuve haut droite -->
-      <div class="titre-epreuve-bloc">
-        <span class="titre-epreuve-label">Épreuve</span>
-        <span class="titre-epreuve-val" id="titre-epreuve-doc">—</span>
-      </div>
+        <div class="lvls">
+          <button class="lb" data-v="0" onclick="clickLvl(this,'${s.id}',${gi},${mi},0)">✗<div class="tip">Non atteint — 0 pt</div></button>
+          <button class="lb" data-v="1" onclick="clickLvl(this,'${s.id}',${gi},${mi},1)">~<div class="tip">Partiellement atteint — 1 pt</div></button>
+          <button class="lb" data-v="2" onclick="clickLvl(this,'${s.id}',${gi},${mi},2)">✓<div class="tip">Atteint — 2 pts</div></button>
+        </div>
+        <div class="pts" id="pt-${s.id}-${gi}-${mi}"></div>
+      `;
+      hg.appendChild(row);
+    });
+    sheet.appendChild(hg);
+  });
+
+  // footer
+  const foot = document.createElement('div');
+  foot.className = 'sh-foot';
+  foot.innerHTML = `
+    <div class="obs">
+      <div class="obs-lbl">Observations</div>
+      <div class="obs-line"></div><div class="obs-line"></div>
     </div>
-
-    <!-- Bandeau identité -->
-    <div class="identite-band">
-      <div class="id-cell">
-        <span class="id-label">Candidat(e)</span>
-        <span class="id-value" id="nom-doc">—</span>
-      </div>
-      <div class="id-cell titre-cell">
-        <span class="id-label">Épreuve</span>
-        <span class="id-value" id="titre-band-doc">—</span>
-      </div>
-      <div class="id-cell">
-        <span class="id-label">Date de l'épreuve</span>
-        <span class="id-value" id="date-doc">—</span>
-      </div>
-      <div class="id-cell score-cell">
-        <span class="id-label">Note finale</span>
-        <span class="id-value" id="score-doc">— / 20</span>
-      </div>
+    <div class="sig">
+      <div class="sig-lbl">Signature enseignant</div>
+      <div class="sig-box"></div>
     </div>
+  `;
+  sheet.appendChild(foot);
+  return sheet;
+}
 
-    <!-- Légende -->
-    <div class="legend-bar">
-      <div class="legend-item">
-        <div class="legend-dot ld-ti"></div><span style="color:var(--ti-tx)">Très insuffisant (1 pt)</span>
-      </div>
-      <span class="legend-sep">·</span>
-      <div class="legend-item">
-        <div class="legend-dot ld-fr"></div><span style="color:var(--fr-tx)">Fragile (1,75 pt)</span>
-      </div>
-      <span class="legend-sep">·</span>
-      <div class="legend-item">
-        <div class="legend-dot ld-s"></div><span style="color:var(--s-tx)">Satisfaisant (3 pts)</span>
-      </div>
-      <span class="legend-sep">·</span>
-      <div class="legend-item">
-        <div class="legend-dot ld-ts"></div><span style="color:var(--ts-tx)">Très satisfaisant (4 pts)</span>
-      </div>
-      <span class="legend-sep">·</span>
-      <span style="font-size:11px;color:#999;font-style:italic">2 cases adjacentes = moyenne des deux niveaux</span>
-    </div>
-
-    <!-- Grille -->
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Qualité orale<br>de l'épreuve</th>
-            <th>Qualité de la prise<br>de parole en continu</th>
-            <th>Qualité<br>des connaissances</th>
-            <th>Qualité<br>de l'interaction</th>
-            <th>Qualité et construction<br>de l'argumentation</th>
-          </tr>
-        </thead>
-        <tbody>
-
-          <!-- Très insuffisant (lv=0) -->
-          <tr class="niveau-ti">
-            <td class="td-niveau">Très<br>insuffisant</td>
-            <td id="td-0-0">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(0,0,this)"><span class="cbox" id="box-0-0"></span></label><span
-                  class="cell-text">Difficilement audible sur l'ensemble de la prestation. Le candidat ne parvient pas à
-                  capter l'attention.</span></div>
-            </td>
-            <td id="td-1-0">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(1,0,this)"><span class="cbox" id="box-1-0"></span></label><span
-                  class="cell-text">Énoncés courts, ponctués de pauses et de faux démarrages ou énoncés longs à la
-                  syntaxe mal maîtrisée.</span></div>
-            </td>
-            <td id="td-2-0">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(2,0,this)"><span class="cbox" id="box-2-0"></span></label><span
-                  class="cell-text">Connaissances imprécises, incapacité à répondre aux questions, même avec une aide et
-                  des relances.</span></div>
-            </td>
-            <td id="td-3-0">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(3,0,this)"><span class="cbox" id="box-3-0"></span></label><span
-                  class="cell-text">Réponses courtes ou rares. La communication repose principalement sur
-                  l'évaluateur.</span></div>
-            </td>
-            <td id="td-4-0">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(4,0,this)"><span class="cbox" id="box-4-0"></span></label><span
-                  class="cell-text">Pas de compréhension du sujet, discours non argumenté et décousu.</span></div>
-            </td>
-          </tr>
-
-          <!-- Fragile (lv=1) -->
-          <tr class="niveau-fr">
-            <td class="td-niveau">Fragile</td>
-            <td id="td-0-1">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(0,1,this)"><span class="cbox" id="box-0-1"></span></label><span
-                  class="cell-text">La voix devient plus audible et intelligible au fil de l'épreuve mais demeure
-                  monocorde. Vocabulaire limité ou approximatif.</span></div>
-            </td>
-            <td id="td-1-1">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(1,1,this)"><span class="cbox" id="box-1-1"></span></label><span
-                  class="cell-text">Discours assez clair mais vocabulaire limité et énoncés schématiques.</span></div>
-            </td>
-            <td id="td-2-1">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(2,1,this)"><span class="cbox" id="box-2-1"></span></label><span
-                  class="cell-text">Connaissances réelles, mais difficulté à les mobiliser en situation à l'occasion des
-                  questions du jury.</span></div>
-            </td>
-            <td id="td-3-1">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(3,1,this)"><span class="cbox" id="box-3-1"></span></label><span
-                  class="cell-text">L'entretien permet une amorce d'échange. L'interaction reste limitée.</span></div>
-            </td>
-            <td id="td-4-1">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(4,1,this)"><span class="cbox" id="box-4-1"></span></label><span
-                  class="cell-text">Début de démonstration mais raisonnement lacunaire. Discours insuffisamment
-                  structuré.</span></div>
-            </td>
-          </tr>
-
-          <!-- Satisfaisant (lv=2) -->
-          <tr class="niveau-s">
-            <td class="td-niveau">Satisfaisant</td>
-            <td id="td-0-2">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(0,2,this)"><span class="cbox" id="box-0-2"></span></label><span
-                  class="cell-text">Quelques variations dans l'utilisation de la voix ; prise de parole affirmée. Il
-                  utilise un lexique adapté. Le candidat parvient à susciter l'intérêt.</span></div>
-            </td>
-            <td id="td-1-2">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(1,2,this)"><span class="cbox" id="box-1-2"></span></label><span
-                  class="cell-text">Discours articulé et pertinent, énoncés bien construits.</span></div>
-            </td>
-            <td id="td-2-2">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(2,2,this)"><span class="cbox" id="box-2-2"></span></label><span
-                  class="cell-text">Connaissances précises, une capacité à les mobiliser en réponses aux questions du
-                  jury avec éventuellement quelques relances.</span></div>
-            </td>
-            <td id="td-3-2">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(3,2,this)"><span class="cbox" id="box-3-2"></span></label><span
-                  class="cell-text">Répond, contribue, réagit. Se reprend, reformule en s'aidant des propositions du
-                  jury.</span></div>
-            </td>
-            <td id="td-4-2">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(4,2,this)"><span class="cbox" id="box-4-2"></span></label><span
-                  class="cell-text">Démonstration construite et appuyée sur des arguments précis et pertinents.</span>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Très satisfaisant (lv=3) -->
-          <tr class="niveau-ts">
-            <td class="td-niveau">Très<br>satisfaisant</td>
-            <td id="td-0-3">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(0,3,this)"><span class="cbox" id="box-0-3"></span></label><span
-                  class="cell-text">La voix soutient efficacement le discours. Qualités prosodiques marquées (débit,
-                  fluidité, variations et nuances pertinentes, etc.). Le candidat est pleinement engagé dans sa parole.
-                  Il utilise un vocabulaire riche et précis.</span></div>
-            </td>
-            <td id="td-1-3">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(1,3,this)"><span class="cbox" id="box-1-3"></span></label><span
-                  class="cell-text">Discours fluide, efficace, tirant pleinement profit du temps et développant ses
-                  propositions.</span></div>
-            </td>
-            <td id="td-2-3">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(2,3,this)"><span class="cbox" id="box-2-3"></span></label><span
-                  class="cell-text">Connaissances maîtrisées, les réponses aux questions du jury témoignent d'une
-                  capacité à mobiliser ces connaissances à bon escient et à les exposer clairement.</span></div>
-            </td>
-            <td id="td-3-3">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(3,3,this)"><span class="cbox" id="box-3-3"></span></label><span
-                  class="cell-text">S'engage dans sa parole, réagit de façon pertinente. Prend l'initiative dans
-                  l'échange. Exploite judicieusement les éléments fournis par la situation d'interaction.</span></div>
-            </td>
-            <td id="td-4-3">
-              <div class="cell-inner"><label class="custom-check"><input type="checkbox"
-                    onchange="handleCheck(4,3,this)"><span class="cbox" id="box-4-3"></span></label><span
-                  class="cell-text">Maîtrise des enjeux du sujet, capacité à conduire et exprimer une argumentation
-                  personnelle, bien construite et raisonnée.</span></div>
-            </td>
-          </tr>
-
-          <!-- Score -->
-          <tr class="score-row">
-            <td colspan="6">
-              <div class="score-inner">
-                <span class="score-detail" id="score-detail"></span>
-                <span style="font-size:12.5px;font-weight:700;">Note calculée :</span>
-                <span class="score-value-doc" id="score-doc2">— / 20</span>
-              </div>
-            </td>
-          </tr>
-
-        </tbody>
-      </table>
-    </div>
-
-    <div class="doc-footer">
-      <span>© Éditions Hatier, 2020.</span>
-      <span>Page 1 sur 1</span>
-    </div>
-  </div>
-
-  <script>
-    /* ────────────────────────────────────────────
-       BARÈME
-       TI=1  Fragile=1.75  S=3  TS=4
-       Adjacents :
-         TI+Fr = 1.375  ·  Fr+S = 2.375  ·  S+TS = 3.5
-    ──────────────────────────────────────────── */
-    const POINTS = [1, 1.75, 3, 4];
-    const LV_CLS = ['ti', 'fr', 's', 'ts'];
-    const N_CRIT = 5;
-    const N_LV = 4;
-
-    const state = Array.from({ length: N_CRIT }, () => new Set());
-
-    /* ── Cases ──────────────────────────────── */
-    function handleCheck(crit, lv, cb) {
-      const cur = state[crit];
-      if (!cb.checked) {
-        cur.delete(lv);
-      } else {
-        if (cur.size === 0) {
-          cur.add(lv);
-        } else if (cur.size === 1) {
-          const other = [...cur][0];
-          Math.abs(other - lv) === 1 ? cur.add(lv) : (cur.clear(), cur.add(lv));
-        } else {
-          cur.clear(); cur.add(lv);
-        }
-      }
-      syncVisuals(crit);
-      calcScore();
-    }
-
-    function syncVisuals(crit) {
-      const CELL_CLS = LV_CLS.map(c => `ck-${c}`);
-      for (let lv = 0; lv < N_LV; lv++) {
-        const td = document.getElementById(`td-${crit}-${lv}`);
-        const box = document.getElementById(`box-${crit}-${lv}`);
-        if (!td || !box) continue;
-        const cb = td.querySelector('input[type="checkbox"]');
-        const on = state[crit].has(lv);
-        cb.checked = on;
-        box.className = 'cbox' + (on ? ` ck-${LV_CLS[lv]}` : '');
-        CELL_CLS.forEach(c => td.classList.remove(c));
-        if (on) td.classList.add(`ck-${LV_CLS[lv]}`);
-      }
-    }
-
-    /* ── Calcul ─────────────────────────────── */
-    function scoreForCrit(c) {
-      const lvs = [...state[c]].sort((a, b) => a - b);
-      if (!lvs.length) return null;
-      return lvs.length === 1 ? POINTS[lvs[0]] : (POINTS[lvs[0]] + POINTS[lvs[1]]) / 2;
-    }
-
-    function fmt(n) { return parseFloat(n.toFixed(2)).toString().replace('.', ','); }
-
-    function calcScore() {
-      let total = 0, filled = 0;
-      const parts = [];
-      for (let c = 0; c < N_CRIT; c++) {
-        const sc = scoreForCrit(c);
-        if (sc !== null) { total += sc; filled++; parts.push(fmt(sc)); }
-        else parts.push('—');
-      }
-      const note = filled === 0 ? '— / 20' : `${fmt(total)} / 20`;
-      const det = filled > 0 ? `Détail : ${parts.join(' + ')} = ${fmt(total)}` : '';
-      document.getElementById('score-display').textContent = 'Note : ' + note;
-      ['score-doc', 'score-doc2'].forEach(id => document.getElementById(id).textContent = note);
-      document.getElementById('score-detail').textContent = det;
-    }
-
-    /* ── Nom / Date / Titre ─────────────────── */
-    let nomEleve = '', dateEval = '', titreEpreuve = '';
-
-    function updateNom(v) {
-      nomEleve = v.trim();
-      document.getElementById('nom-doc').textContent = nomEleve || '—';
-    }
-
-    function updateDate(v) {
-      dateEval = v;
-      if (!v) { document.getElementById('date-doc').textContent = '—'; return; }
-      const [y, m, d] = v.split('-');
-      const M = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
-        'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-      document.getElementById('date-doc').textContent = `${parseInt(d)} ${M[parseInt(m) - 1]} ${y}`;
-    }
-
-    function updateTitre(v) {
-      titreEpreuve = v.trim();
-      const txt = titreEpreuve || '—';
-      document.getElementById('titre-epreuve-doc').textContent = txt;
-      document.getElementById('titre-band-doc').textContent = txt;
-    }
-
-    /* ── Reset ──────────────────────────────── */
-    function resetAll() {
-      for (let c = 0; c < N_CRIT; c++) { state[c].clear(); syncVisuals(c); }
-      calcScore();
-    }
-
-    /* ── Export PDF ─────────────────────────── */
-    function exportPDF() {
-      if (!nomEleve) {
-        alert("Veuillez saisir le nom de l'élève avant d'exporter.");
-        document.getElementById('nom-input').focus(); return;
-      }
-      const dp = dateEval ? `_${dateEval}` : '';
-      const tp = titreEpreuve ? `_${titreEpreuve.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-]/g, '')}` : '';
-      const filename = `Oral_${nomEleve.replace(/\s+/g, '_')}${dp}${tp}.pdf`;
-      html2pdf().set({
-        margin: [5, 4, 5, 4],
-        filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-      }).from(document.getElementById('document')).save();
-    }
-
-    /* ── Init date du jour ──────────────────── */
-    (function () {
-      const t = new Date(), p = n => String(n).padStart(2, '0');
-      const v = `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}`;
-      document.getElementById('date-input').value = v;
-      updateDate(v);
-    })();
-  </script>
+const container = document.getElementById('pages');
+DATA.forEach(s => container.appendChild(build(s)));
+</script>
 </body>
-
 </html>
